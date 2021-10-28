@@ -1,16 +1,15 @@
 // import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
 
 import api from '../../services/api';
 
-// import type { RootState } from '../store';
+import type { RootState } from '../store';
 
-// Define a type for the slice state
 interface AuthState {
     isLoggedIn: boolean;
 }
 
-// Define the initial state using that type
 const initialState: AuthState = {
     isLoggedIn: false,
 };
@@ -35,40 +34,104 @@ interface LoginResponseData {
     user: UserResponseData;
 }
 
-export const login = createAsyncThunk<
-    // Return type of the payload creator
-    LoginResponseData,
-    // First argument to the payload creator
-    LoginPayload
->(
+export const login = createAsyncThunk<LoginResponseData, LoginPayload>(
     'auth/login',
-    // Declare the type your function argument here:
     async (data) => {
         const response = await api({
             method: 'post',
             url: 'auth/login',
             data,
+            withCredentials: true,
         });
-        // Inferred return type: Promise<MyData>
+
         return response.data as LoginResponseData;
     },
 );
 
+interface ForgotResponse {
+    message: string;
+}
+
+interface ForgotPayload {
+    email: string;
+}
+
+export const forgot = createAsyncThunk<ForgotResponse, ForgotPayload>(
+    'auth/forgot',
+    async (data) => {
+        const response = await api({
+            method: 'post',
+            url: 'auth/forgot',
+            data,
+        });
+
+        return response.data as ForgotResponse;
+    },
+);
+
+interface ResetResponse {
+    message: string;
+}
+
+interface ResetPayload {
+    password: string;
+    otp: string;
+}
+
+export const reset = createAsyncThunk<ResetResponse, ResetPayload>('auth/reset', async (data) => {
+    const response = await api({
+        method: 'post',
+        url: 'auth/reset',
+        data,
+    });
+
+    return response.data as ResetResponse;
+});
+
+export const logout = createAsyncThunk('auth/logout', async () => {
+    const response = await api({
+        method: 'post',
+        url: 'auth/logout',
+        withCredentials: true,
+    });
+
+    return response.data;
+});
+
 export const authSlice = createSlice({
     name: 'auth',
-    // `createSlice` will infer the state type from the `initialState` argument
     initialState,
-    reducers: {},
+    reducers: {
+        setIsLoggedIn: (state, action) => {
+            const { isLoggedIn } = action.payload;
+            state.isLoggedIn = isLoggedIn;
+        },
+    },
     extraReducers: (builder) => {
         builder.addCase(login.fulfilled, (state) => {
             state.isLoggedIn = true;
+        });
 
-            console.log({ state });
+        builder.addCase(logout.fulfilled, (state) => {
+            state.isLoggedIn = false;
+        });
+
+        builder.addCase(forgot.fulfilled, (_, action) => {
+            const { message } = action.payload;
+
+            toast.success(message);
+        });
+
+        builder.addCase(reset.fulfilled, (_, action) => {
+            const { message } = action.payload;
+
+            toast.success(message);
         });
     },
 });
 
-// Other code such as selectors can use the imported `RootState` type
-// export const selectCount = (state: RootState) => state.counter.value;
+export const { setIsLoggedIn } = authSlice.actions;
+
+export const selectIsLoggedIn = (state: RootState) => state.auth.isLoggedIn;
 
 export default authSlice.reducer;

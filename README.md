@@ -1,3 +1,17 @@
+# Run locally
+
+#### First time
+
+- Ensure you're using nvm on v12
+- in project root run `touch .env`
+- in project root run `touch .env-cmdrc`
+- Paste values from slack into `.env-cmdrc`
+- run `yarn; yarn start;`
+
+#### Subsequent runs
+
+- run `yarn start`
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
