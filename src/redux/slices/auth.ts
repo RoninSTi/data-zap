@@ -19,7 +19,7 @@ interface LoginPayload {
     password: string;
 }
 
-interface UserResponseData {
+interface UserResponse {
     id: string;
     email: string;
     firstName?: string;
@@ -29,24 +29,21 @@ interface UserResponseData {
     updatedAt: string;
 }
 
-interface LoginResponseData {
+interface LoginResponse {
     message: string;
-    user: UserResponseData;
+    user: UserResponse;
 }
 
-export const login = createAsyncThunk<LoginResponseData, LoginPayload>(
-    'auth/login',
-    async (data) => {
-        const response = await api({
-            method: 'post',
-            url: 'auth/login',
-            data,
-            withCredentials: true,
-        });
+export const login = createAsyncThunk<LoginResponse, LoginPayload>('auth/login', async (data) => {
+    const response = await api({
+        method: 'post',
+        url: 'auth/login',
+        data,
+        withCredentials: true,
+    });
 
-        return response.data as LoginResponseData;
-    },
-);
+    return response.data as LoginResponse;
+});
 
 interface ForgotResponse {
     message: string;
@@ -88,6 +85,32 @@ export const reset = createAsyncThunk<ResetResponse, ResetPayload>('auth/reset',
     return response.data as ResetResponse;
 });
 
+interface RegisterResponse {
+    message: string;
+    user: UserResponse;
+}
+
+interface RegisterPayload {
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    password: string;
+    username: string;
+}
+
+export const register = createAsyncThunk<RegisterResponse, RegisterPayload>(
+    'auth/register',
+    async (data) => {
+        const response = await api({
+            method: 'post',
+            url: 'auth/register',
+            data,
+        });
+
+        return response.data as RegisterResponse;
+    },
+);
+
 export const logout = createAsyncThunk('auth/logout', async () => {
     const response = await api({
         method: 'post',
@@ -123,6 +146,12 @@ export const authSlice = createSlice({
         });
 
         builder.addCase(reset.fulfilled, (_, action) => {
+            const { message } = action.payload;
+
+            toast.success(message);
+        });
+
+        builder.addCase(register.fulfilled, (_, action) => {
             const { message } = action.payload;
 
             toast.success(message);

@@ -7,6 +7,7 @@ import Forgot from '../forgot/forgot.component';
 import Landing from '../landing/landing.component';
 import Login from '../login/login.component';
 import PrivateRoute from '../private-route/private-route.component';
+import Register from '../register/register.component';
 import Reset from '../reset/reset.component';
 
 const AppRouter = () => {
@@ -21,6 +22,9 @@ const AppRouter = () => {
             </Route>
             <Route exact path="/login">
                 <Login />
+            </Route>
+            <Route exact path="/register">
+                <Register />
             </Route>
             <Route exact path="/reset">
                 <Reset />

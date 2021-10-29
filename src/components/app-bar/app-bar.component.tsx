@@ -19,6 +19,10 @@ const ABar = () => {
         history.push('/login');
     };
 
+    const handleOnClickRegister = () => {
+        history.push('/register');
+    };
+
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -71,9 +75,14 @@ const ABar = () => {
                         </Menu>
                     </div>
                 ) : (
-                    <Button color="inherit" onClick={handleOnClickLogin}>
-                        Login
-                    </Button>
+                    <>
+                        <Button color="inherit" onClick={handleOnClickLogin}>
+                            Login
+                        </Button>
+                        <Button color="inherit" onClick={handleOnClickRegister}>
+                            Create Account
+                        </Button>
+                    </>
                 )}
             </Toolbar>
         </AppBar>
