@@ -1,11 +1,13 @@
 import React from 'react';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Grid, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { Link, Redirect, useHistory } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { register, selectIsLoggedIn } from '../../redux/slices/auth';
+import { selectIsLoading } from '../../redux/slices/ui';
 
 const RegisterSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email address format').required('Email is required'),
@@ -31,6 +33,10 @@ const Login = () => {
     const history = useHistory();
 
     const isLoggedIn = useAppSelector(selectIsLoggedIn);
+
+    const isLoading = useAppSelector(selectIsLoading);
+
+    const showLoading = isLoading.some((elem) => elem === 'auth/register');
 
     const handleOnSubmit = async (values: SubmitValues) => {
         const { email, firstName, lastName, password, username } = values;
@@ -116,7 +122,6 @@ const Login = () => {
                     />
                     <TextField
                         margin="normal"
-                        required
                         fullWidth
                         name="firstName"
                         label="First Name"
@@ -128,7 +133,6 @@ const Login = () => {
                     />
                     <TextField
                         margin="normal"
-                        required
                         fullWidth
                         name="lastName"
                         label="Last Name"
@@ -138,9 +142,15 @@ const Login = () => {
                         error={touched.lastName && Boolean(errors.lastName)}
                         helperText={touched.lastName && errors.lastName}
                     />
-                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                    <LoadingButton
+                        type="submit"
+                        loading={showLoading}
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
                         Create Account
-                    </Button>
+                    </LoadingButton>
                     <Grid container>
                         <Grid item xs>
                             <Link to="/login">Have an account? Sign in</Link>

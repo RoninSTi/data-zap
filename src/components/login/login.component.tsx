@@ -1,19 +1,13 @@
 import React from 'react';
-import {
-    Box,
-    Button,
-    Checkbox,
-    FormControlLabel,
-    Grid,
-    TextField,
-    Typography,
-} from '@mui/material';
+import { Box, Checkbox, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { Link, Redirect } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { login, selectIsLoggedIn } from '../../redux/slices/auth';
+import { selectIsLoading } from '../../redux/slices/ui';
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -36,6 +30,10 @@ const Login = () => {
     const dispatch = useAppDispatch();
 
     const isLoggedIn = useAppSelector(selectIsLoggedIn);
+
+    const isLoading = useAppSelector(selectIsLoading);
+
+    const showLoading = isLoading.some((elem) => elem === 'auth/login');
 
     const handleOnSubmit = (values: SubmitValues) => {
         const { email, password } = values;
@@ -101,9 +99,15 @@ const Login = () => {
                         control={<Checkbox value="remember" color="primary" />}
                         label="Remember me"
                     />
-                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                    <LoadingButton
+                        type="submit"
+                        loading={showLoading}
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
                         Sign In
-                    </Button>
+                    </LoadingButton>
                     <Grid container>
                         <Grid item xs>
                             <Link to="/forgot">Forgot password?</Link>
