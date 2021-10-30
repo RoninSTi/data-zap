@@ -14,6 +14,10 @@ const initialState: AuthState = {
     isLoggedIn: false,
 };
 
+interface ApiError {
+    message: string;
+}
+
 interface LoginPayload {
     email: string;
     password: string;
@@ -34,16 +38,23 @@ interface LoginResponse {
     user: UserResponse;
 }
 
-export const login = createAsyncThunk<LoginResponse, LoginPayload>('auth/login', async (data) => {
-    const response = await api({
-        method: 'post',
-        url: 'auth/login',
-        data,
-        withCredentials: true,
-    });
+export const login = createAsyncThunk<LoginResponse, LoginPayload, { rejectValue: ApiError }>(
+    'auth/login',
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await api({
+                method: 'post',
+                url: 'auth/login',
+                data,
+                withCredentials: true,
+            });
 
-    return response.data as LoginResponse;
-});
+            return response.data as LoginResponse;
+        } catch (err: any) {
+            return rejectWithValue(err.response.data as ApiError);
+        }
+    },
+);
 
 interface ForgotResponse {
     message: string;
