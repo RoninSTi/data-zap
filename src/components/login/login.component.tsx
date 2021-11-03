@@ -61,6 +61,8 @@ const Login = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
             }}
         >
             <Typography component="h1" variant="h5">

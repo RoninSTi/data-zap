@@ -103,7 +103,7 @@ const Login = () => {
                         autoComplete="username"
                         value={values.username}
                         onChange={handleChange}
-                        error={touched.email && Boolean(errors.username)}
+                        error={touched.username && Boolean(errors.username)}
                         helperText={touched.username && errors.username}
                     />
                     <TextField

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 
 import { useAppDispatch } from '../../redux/hooks';
-import { setIsLoggedIn } from '../../redux/slices/auth';
+import { setAuthState } from '../../redux/slices/auth';
 
 const CookieCheck = () => {
     const dispatch = useAppDispatch();
@@ -13,7 +13,9 @@ const CookieCheck = () => {
 
     useEffect(() => {
         if (expires && new Date(expires) > new Date()) {
-            dispatch(setIsLoggedIn({ isLoggedIn: true }));
+            dispatch(setAuthState({ isLoggedIn: true, isCookieChecked: true }));
+        } else {
+            console.log('expired');
         }
     }, [dispatch, expires]);
 

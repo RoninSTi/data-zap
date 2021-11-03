@@ -13,9 +13,11 @@ type RejectedAction = ReturnType<GenericAsyncThunk['rejected']>;
 
 interface UIState {
     isLoading: Array<string>;
+    isDrawerOpen: boolean;
 }
 
 const initialState: UIState = {
+    isDrawerOpen: false,
     isLoading: [],
 };
 
@@ -40,7 +42,11 @@ const getBaseActionType = (type: string) => {
 export const uiSlice = createSlice({
     name: 'ui',
     initialState,
-    reducers: {},
+    reducers: {
+        toggleDrawer: (state) => {
+            state.isDrawerOpen = !state.isDrawerOpen;
+        },
+    },
     extraReducers: (builder) => {
         builder.addMatcher(isFulfilledAction, (state, action) => {
             const type = getBaseActionType(action.type);
@@ -64,6 +70,10 @@ export const uiSlice = createSlice({
     },
 });
 
+export const selectIsDrawerOpen = (state: RootState) => state.ui.isDrawerOpen;
+
 export const selectIsLoading = (state: RootState) => state.ui.isLoading;
+
+export const { toggleDrawer } = uiSlice.actions;
 
 export default uiSlice.reducer;

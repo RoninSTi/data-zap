@@ -2,21 +2,19 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
-import api from '../../services/api';
+import api, { ApiError } from '../../services/api';
 
 import type { RootState } from '../store';
 
 interface AuthState {
+    isCookieChecked: boolean;
     isLoggedIn: boolean;
 }
 
 const initialState: AuthState = {
+    isCookieChecked: false,
     isLoggedIn: false,
 };
-
-interface ApiError {
-    message: string;
-}
 
 interface LoginPayload {
     email: string;
@@ -64,16 +62,20 @@ interface ForgotPayload {
     email: string;
 }
 
-export const forgot = createAsyncThunk<ForgotResponse, ForgotPayload>(
+export const forgot = createAsyncThunk<ForgotResponse, ForgotPayload, { rejectValue: ApiError }>(
     'auth/forgot',
-    async (data) => {
-        const response = await api({
-            method: 'post',
-            url: 'auth/forgot',
-            data,
-        });
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await api({
+                method: 'post',
+                url: 'auth/forgot',
+                data,
+            });
 
-        return response.data as ForgotResponse;
+            return response.data as ForgotResponse;
+        } catch (err: any) {
+            return rejectWithValue(err.response.data as ApiError);
+        }
     },
 );
 
@@ -86,15 +88,22 @@ interface ResetPayload {
     otp: string;
 }
 
-export const reset = createAsyncThunk<ResetResponse, ResetPayload>('auth/reset', async (data) => {
-    const response = await api({
-        method: 'post',
-        url: 'auth/reset',
-        data,
-    });
+export const reset = createAsyncThunk<ResetResponse, ResetPayload, { rejectValue: ApiError }>(
+    'auth/reset',
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await api({
+                method: 'post',
+                url: 'auth/reset',
+                data,
+            });
 
-    return response.data as ResetResponse;
-});
+            return response.data as ResetResponse;
+        } catch (err: any) {
+            return rejectWithValue(err.response.data as ApiError);
+        }
+    },
+);
 
 interface RegisterResponse {
     message: string;
@@ -109,9 +118,12 @@ interface RegisterPayload {
     username: string;
 }
 
-export const register = createAsyncThunk<RegisterResponse, RegisterPayload>(
-    'auth/register',
-    async (data) => {
+export const register = createAsyncThunk<
+    RegisterResponse,
+    RegisterPayload,
+    { rejectValue: ApiError }
+>('auth/register', async (data, { rejectWithValue }) => {
+    try {
         const response = await api({
             method: 'post',
             url: 'auth/register',
@@ -119,8 +131,10 @@ export const register = createAsyncThunk<RegisterResponse, RegisterPayload>(
         });
 
         return response.data as RegisterResponse;
-    },
-);
+    } catch (err: any) {
+        return rejectWithValue(err.response.data as ApiError);
+    }
+});
 
 export const logout = createAsyncThunk('auth/logout', async () => {
     const response = await api({
@@ -136,9 +150,11 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setIsLoggedIn: (state, action) => {
-            const { isLoggedIn } = action.payload;
+        setAuthState: (state, action) => {
+            const { isLoggedIn, isCookieChecked } = action.payload;
+
             state.isLoggedIn = isLoggedIn;
+            state.isCookieChecked = isCookieChecked;
         },
     },
     extraReducers: (builder) => {
@@ -170,7 +186,9 @@ export const authSlice = createSlice({
     },
 });
 
-export const { setIsLoggedIn } = authSlice.actions;
+export const { setAuthState } = authSlice.actions;
+
+export const selectAuthState = (state: RootState) => state.auth;
 
 export const selectIsLoggedIn = (state: RootState) => state.auth.isLoggedIn;
 

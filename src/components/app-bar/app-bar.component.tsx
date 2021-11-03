@@ -1,12 +1,43 @@
 import React, { useState } from 'react';
-import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import { styled } from '@mui/material/styles';
+import { Button, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useHistory } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { logout, selectIsLoggedIn } from '../../redux/slices/auth';
+import { DRAWER_WIDTH } from '../../constants';
 
-const ABar = () => {
+interface AppBarProps extends MuiAppBarProps {
+    open?: boolean;
+}
+
+const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop: any) => prop !== 'open',
+})<AppBarProps>(({ theme, open }: any) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(['width', 'margin', 'display'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+        marginLeft: DRAWER_WIDTH,
+        width: `calc(100% - ${DRAWER_WIDTH}px)`,
+        transition: theme.transitions.create(['width', 'margin', 'display'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
+
+interface ABarProps {
+    isDrawerOpen: boolean;
+    toggleDrawer: () => void;
+}
+
+const ABar = ({ isDrawerOpen, toggleDrawer }: ABarProps) => {
     const dispatch = useAppDispatch();
 
     const history = useHistory();
@@ -37,8 +68,20 @@ const ABar = () => {
     };
 
     return (
-        <AppBar position="static">
+        <AppBar open={isDrawerOpen}>
             <Toolbar>
+                <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="open drawer"
+                    onClick={toggleDrawer}
+                    sx={{
+                        marginRight: '36px',
+                        ...((isDrawerOpen || !isLoggedIn) && { display: 'none' }),
+                    }}
+                >
+                    <MenuIcon />
+                </IconButton>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                     DataZap
                 </Typography>

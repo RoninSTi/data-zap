@@ -1,9 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import { Route, Redirect, RouteProps } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
 
 import { useAppSelector } from '../../redux/hooks';
-import { selectIsLoggedIn } from '../../redux/slices/auth';
+import { selectAuthState } from '../../redux/slices/auth';
 
 interface PrivateRouteProps extends RouteProps {
     // tslint:disable-next-line:no-any
@@ -15,27 +14,15 @@ interface PrivateRouteProps extends RouteProps {
 const PrivateRoute = (props: PrivateRouteProps) => {
     const { component: Component, children, ...rest } = props;
 
-    const [cookies] = useCookies(['access_expiration']);
+    const { isCookieChecked, isLoggedIn } = useAppSelector(selectAuthState);
 
-    const expires = cookies?.access_expiration?.expires;
-
-    const isLoggedIn = useAppSelector(selectIsLoggedIn);
-
-    if (expires && new Date(expires) < new Date())
-        return (
-            <Redirect
-                to={{
-                    pathname: '/login',
-                    state: { from: rest.location },
-                }}
-            />
-        );
+    const redirect = isCookieChecked && !isLoggedIn;
 
     return (
         <Route
             {...rest}
             render={(routeProps) =>
-                isLoggedIn ? (
+                !redirect ? (
                     Component ? (
                         <Component {...routeProps} />
                     ) : (
