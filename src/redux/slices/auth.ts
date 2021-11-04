@@ -16,11 +16,6 @@ const initialState: AuthState = {
     isLoggedIn: false,
 };
 
-interface LoginPayload {
-    email: string;
-    password: string;
-}
-
 interface UserResponse {
     id: string;
     email: string;
@@ -30,29 +25,6 @@ interface UserResponse {
     createdAt: string;
     updatedAt: string;
 }
-
-interface LoginResponse {
-    message: string;
-    user: UserResponse;
-}
-
-export const login = createAsyncThunk<LoginResponse, LoginPayload, { rejectValue: ApiError }>(
-    'auth/login',
-    async (data, { rejectWithValue }) => {
-        try {
-            const response = await api({
-                method: 'post',
-                url: 'auth/login',
-                data,
-                withCredentials: true,
-            });
-
-            return response.data as LoginResponse;
-        } catch (err: any) {
-            return rejectWithValue(err.response.data as ApiError);
-        }
-    },
-);
 
 interface ForgotResponse {
     message: string;
@@ -105,37 +77,6 @@ export const reset = createAsyncThunk<ResetResponse, ResetPayload, { rejectValue
     },
 );
 
-interface RegisterResponse {
-    message: string;
-    user: UserResponse;
-}
-
-interface RegisterPayload {
-    email: string;
-    firstName?: string;
-    lastName?: string;
-    password: string;
-    username: string;
-}
-
-export const register = createAsyncThunk<
-    RegisterResponse,
-    RegisterPayload,
-    { rejectValue: ApiError }
->('auth/register', async (data, { rejectWithValue }) => {
-    try {
-        const response = await api({
-            method: 'post',
-            url: 'auth/register',
-            data,
-        });
-
-        return response.data as RegisterResponse;
-    } catch (err: any) {
-        return rejectWithValue(err.response.data as ApiError);
-    }
-});
-
 export const logout = createAsyncThunk('auth/logout', async () => {
     const response = await api({
         method: 'post',
@@ -158,10 +99,6 @@ export const authSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(login.fulfilled, (state) => {
-            state.isLoggedIn = true;
-        });
-
         builder.addCase(logout.fulfilled, (state) => {
             state.isLoggedIn = false;
         });
@@ -173,12 +110,6 @@ export const authSlice = createSlice({
         });
 
         builder.addCase(reset.fulfilled, (_, action) => {
-            const { message } = action.payload;
-
-            toast.success(message);
-        });
-
-        builder.addCase(register.fulfilled, (_, action) => {
             const { message } = action.payload;
 
             toast.success(message);

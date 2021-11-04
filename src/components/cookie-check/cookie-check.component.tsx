@@ -15,7 +15,7 @@ const CookieCheck = () => {
         if (expires && new Date(expires) > new Date()) {
             dispatch(setAuthState({ isLoggedIn: true, isCookieChecked: true }));
         } else {
-            console.log('expired');
+            dispatch(setAuthState({ isLoggedIn: false, isCookieChecked: true }));
         }
     }, [dispatch, expires]);
 

@@ -3,11 +3,9 @@ import { Box, Grid, TextField, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import { Link, Redirect, useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { register, selectIsLoggedIn } from '../../redux/slices/auth';
-import { selectIsLoading } from '../../redux/slices/ui';
+import { useRegister } from '../../queries/auth';
 
 const RegisterSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email address format').required('Email is required'),
@@ -27,29 +25,13 @@ interface SubmitValues {
     username: string;
 }
 
-const Login = () => {
-    const dispatch = useAppDispatch();
-
+const Register = () => {
     const history = useHistory();
 
-    const isLoggedIn = useAppSelector(selectIsLoggedIn);
-
-    const isLoading = useAppSelector(selectIsLoading);
-
-    const showLoading = isLoading.some((elem) => elem === 'auth/register');
+    const register = useRegister(history);
 
     const handleOnSubmit = async (values: SubmitValues) => {
-        const { email, firstName, lastName, password, username } = values;
-
-        const data = { email, firstName, lastName, password, username };
-
-        try {
-            await dispatch(register(data));
-
-            history.push('/login');
-        } catch (err) {
-            console.log(err);
-        }
+        register.mutate(values);
     };
 
     const { errors, handleChange, handleSubmit, touched, values } = useFormik({
@@ -64,8 +46,6 @@ const Login = () => {
         onSubmit: handleOnSubmit,
     });
 
-    if (isLoggedIn) return <Redirect to="/dashboard" />;
-
     return (
         <Box
             sx={{
@@ -73,6 +53,8 @@ const Login = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
             }}
         >
             <Typography component="h1" variant="h5">
@@ -144,7 +126,7 @@ const Login = () => {
                     />
                     <LoadingButton
                         type="submit"
-                        loading={showLoading}
+                        loading={register.isLoading}
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
@@ -162,4 +144,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Register;

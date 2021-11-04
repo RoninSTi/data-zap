@@ -6,8 +6,8 @@ import { useFormik } from 'formik';
 import { Link, Redirect } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { login, selectIsLoggedIn } from '../../redux/slices/auth';
-import { selectIsLoading } from '../../redux/slices/ui';
+import { selectIsLoggedIn } from '../../redux/slices/auth';
+import { useLogin } from '../../queries/auth';
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -31,16 +31,10 @@ const Login = () => {
 
     const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
-    const isLoading = useAppSelector(selectIsLoading);
-
-    const showLoading = isLoading.some((elem) => elem === 'auth/login');
+    const login = useLogin(dispatch);
 
     const handleOnSubmit = (values: SubmitValues) => {
-        const { email, password } = values;
-
-        const data = { email, password };
-
-        dispatch(login(data));
+        login.mutate(values);
     };
 
     const { errors, handleChange, handleSubmit, touched, values } = useFormik({
@@ -103,7 +97,7 @@ const Login = () => {
                     />
                     <LoadingButton
                         type="submit"
-                        loading={showLoading}
+                        loading={login.isLoading}
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
