@@ -44,7 +44,7 @@ const Logs = () => {
         <Box>
             <Loader isLoading={isLoading}>
                 <Box>
-                    <Link to="/dashboard/logs/new">New Log</Link>
+                    <Link to="/dashboard/logs/create">New Log</Link>
                 </Box>
                 {data?.logs.length ? (
                     <LogsTable

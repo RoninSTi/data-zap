@@ -6,12 +6,9 @@ import { selectIsDrawerOpen, toggleDrawer } from '../../redux/slices/ui';
 
 import AppBar from '../app-bar/app-bar.component';
 import Dashboard from '../dashboard/dashboard.component';
-import Forgot from '../forgot/forgot.component';
-import Landing from '../landing/landing.component';
-import Login from '../login/login.component';
 import PrivateRoute from '../private-route/private-route.component';
-import Register from '../register/register.component';
-import Reset from '../reset/reset.component';
+
+import { ROUTES } from '../../routes';
 
 const AppRouter = () => {
     const dispatch = useAppDispatch();
@@ -26,21 +23,11 @@ const AppRouter = () => {
         <Router>
             <AppBar isDrawerOpen={isDrawerOpen} toggleDrawer={handleToggleDrawer} />
             <Box sx={{ display: 'flex', flex: 1 }}>
-                <Route exact path="/">
-                    <Landing />
-                </Route>
-                <Route exact path="/forgot">
-                    <Forgot />
-                </Route>
-                <Route exact path="/login">
-                    <Login />
-                </Route>
-                <Route exact path="/register">
-                    <Register />
-                </Route>
-                <Route exact path="/reset">
-                    <Reset />
-                </Route>
+                {ROUTES.map((route: any) => (
+                    <Route key={route.path} exact={route.isExact} path={route.path}>
+                        <route.component />
+                    </Route>
+                ))}
                 <PrivateRoute path="/dashboard">
                     <Dashboard isDrawerOpen={isDrawerOpen} toggleDrawer={handleToggleDrawer} />
                 </PrivateRoute>

@@ -1,76 +1,74 @@
 import React from 'react';
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import GraphIcon from '@mui/icons-material/ShowChart';
-import PeopleIcon from '@mui/icons-material/People';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import LayersIcon from '@mui/icons-material/Layers';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 
-import { NavLink } from 'react-router-dom';
+import HelpIcon from '@mui/icons-material/HelpOutline';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PowerIcon from '@mui/icons-material/PowerSettingsNew';
 
-export const mainListItems = (
-    <div>
-        <NavLink to="/dashboard">
-            <ListItem button>
+import { useHistory, useLocation } from 'react-router-dom';
+
+import { useAppDispatch } from '../../redux/hooks';
+import { useLogout } from '../../queries/auth';
+import { SIDENAV_ROUTES } from '../../routes';
+
+export const MainListItems = () => {
+    const history = useHistory();
+
+    const { pathname } = useLocation();
+
+    const handleOnClick = (event: React.MouseEvent<HTMLDivElement>, path: string) => {
+        history.push(path);
+    };
+
+    return (
+        <div>
+            {SIDENAV_ROUTES.map((listItem: any) => (
+                <ListItemButton
+                    key={listItem.path}
+                    onClick={(event) => handleOnClick(event, listItem.path)}
+                    selected={pathname === listItem.path}
+                >
+                    <ListItemIcon>
+                        <listItem.icon />
+                    </ListItemIcon>
+                    <ListItemText primary={listItem.name} />
+                </ListItemButton>
+            ))}
+        </div>
+    );
+};
+
+export const SecondaryListItems = () => {
+    const dispatch = useAppDispatch();
+
+    const logout = useLogout(dispatch);
+
+    const handleOnClickLogout = () => {
+        logout.mutate();
+    };
+
+    return (
+        <div>
+            <ListItemButton>
                 <ListItemIcon>
-                    <DashboardIcon />
+                    <HelpIcon />
                 </ListItemIcon>
-                <ListItemText primary="Dashboard" />
-            </ListItem>
-        </NavLink>
-        <NavLink to="/dashboard/logs">
-            <ListItem button>
+                <ListItemText primary="Help" />
+            </ListItemButton>
+            <ListItemButton>
                 <ListItemIcon>
-                    <GraphIcon />
+                    <SettingsIcon />
                 </ListItemIcon>
-                <ListItemText primary="Logs" />
-            </ListItem>
-        </NavLink>
-        <ListItem button>
-            <ListItemIcon>
-                <PeopleIcon />
-            </ListItemIcon>
-            <ListItemText primary="Customers" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <BarChartIcon />
-            </ListItemIcon>
-            <ListItemText primary="Reports" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <LayersIcon />
-            </ListItemIcon>
-            <ListItemText primary="Integrations" />
-        </ListItem>
-    </div>
-);
-
-export const secondaryListItems = (
-    <div>
-        <ListSubheader inset>Saved reports</ListSubheader>
-        <ListItem button>
-            <ListItemIcon>
-                <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Current month" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Last quarter" />
-        </ListItem>
-        <ListItem button>
-            <ListItemIcon>
-                <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Year-end sale" />
-        </ListItem>
-    </div>
-);
+                <ListItemText primary="Settings" />
+            </ListItemButton>
+            <ListItemButton onClick={handleOnClickLogout}>
+                <ListItemIcon>
+                    <PowerIcon />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
+            </ListItemButton>
+        </div>
+    );
+};

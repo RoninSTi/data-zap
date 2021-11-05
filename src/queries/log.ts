@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from 'react-query';
+import { History } from 'history';
 
 import api from '../services/api';
 
@@ -68,12 +69,13 @@ export const fetchLogs = async (params: FetchLogsArgs) => {
     return response.data as FetchLogsResponse;
 };
 
-export const useCreateLog = () => {
+export const useCreateLog = (history: History) => {
     const queryClient = useQueryClient();
 
     return useMutation(createLog, {
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries('logs');
+            history.push(`/dashboard/logs/${data.log.id}`);
         },
     });
 };

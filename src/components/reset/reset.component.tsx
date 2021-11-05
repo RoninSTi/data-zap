@@ -1,12 +1,12 @@
 import React from 'react';
-import { Box, Button, Grid, Link, TextField, Typography } from '@mui/material';
+import { Box, Grid, Link, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { useHistory, useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 
-import { useAppDispatch } from '../../redux/hooks';
-import { reset } from '../../redux/slices/auth';
+import { useReset } from '../../queries/auth';
 
 const ResetSchema = Yup.object().shape({
     password: Yup.string()
@@ -20,11 +20,11 @@ interface SubmitValues {
 }
 
 const Forgot = () => {
-    const dispatch = useAppDispatch();
-
     const history = useHistory();
 
     const { search } = useLocation();
+
+    const reset = useReset(history);
 
     const query = queryString.parse(search);
 
@@ -33,13 +33,7 @@ const Forgot = () => {
 
         const data = { password, otp: query?.otp as string };
 
-        try {
-            await dispatch(reset(data));
-
-            history.push('/login');
-        } catch (err) {
-            console.log({ err });
-        }
+        reset.mutate(data);
     };
 
     const { errors, handleChange, handleSubmit, touched, values } = useFormik({
@@ -78,9 +72,15 @@ const Forgot = () => {
                         error={touched.password && Boolean(errors.password)}
                         helperText={touched.password && errors.password}
                     />
-                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                    <LoadingButton
+                        type="submit"
+                        loading={reset.isLoading}
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
                         Reset Password
-                    </Button>
+                    </LoadingButton>
                     <Grid container>
                         <Grid item>
                             <Link href="#" variant="body2">

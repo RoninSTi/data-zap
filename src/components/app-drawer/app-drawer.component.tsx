@@ -1,9 +1,9 @@
 import React from 'react';
-import { Divider, Drawer as MuiDrawer, IconButton, List, Toolbar } from '@mui/material';
+import { Box, Divider, Drawer as MuiDrawer, IconButton, List, Toolbar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ChevronLeft } from '@mui/icons-material';
-import { mainListItems, secondaryListItems } from './list-items';
 
+import { MainListItems, SecondaryListItems } from './list-items';
 import { DRAWER_WIDTH } from '../../constants';
 
 interface AppDrawerProps {
@@ -52,9 +52,14 @@ const AppDrawer = (props: AppDrawerProps) => {
                 </IconButton>
             </Toolbar>
             <Divider />
-            <List>{mainListItems}</List>
-            <Divider />
-            <List>{secondaryListItems}</List>
+            <List sx={{ flexGrow: 1 }}>
+                <MainListItems />
+            </List>
+            <List>
+                <SecondaryListItems />
+            </List>
+            {/** Spacer for query dev-tools */}
+            {process.env.NODE_ENV === 'development' && <Box sx={{ height: '50px' }} />}
         </Drawer>
     );
 };

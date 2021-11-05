@@ -6,6 +6,35 @@ import api, { ApiError } from '../services/api';
 import { setAuthState } from '../redux/slices/auth';
 import { toast } from 'react-toastify';
 
+interface ForgotArgs {
+    email: string;
+}
+
+interface ForgotResponse {
+    message: string;
+}
+
+const forgot = async (data: ForgotArgs) => {
+    const response = await api({
+        method: 'post',
+        url: 'auth/forgot',
+        data,
+    });
+
+    return response.data as ForgotResponse;
+};
+
+export const useForgot = () => {
+    return useMutation(forgot, {
+        onError: (err: any) => {
+            toast.error(err.message);
+        },
+        onSuccess: (data) => {
+            toast.success(data.message);
+        },
+    });
+};
+
 interface LoginArgs {
     email: string;
     password: string;
@@ -57,6 +86,36 @@ export const useLogin = (dispatch: AppDispatch) => {
     });
 };
 
+interface LogoutResponse {
+    message: string;
+}
+
+const logout = async () => {
+    const response = await api({
+        method: 'post',
+        url: 'auth/logout',
+        withCredentials: true,
+    });
+
+    return response.data as LogoutResponse;
+};
+
+export const useLogout = (dispatch: AppDispatch) => {
+    return useMutation(logout, {
+        onError: (err: any) => {
+            toast.error(err.message);
+        },
+        onSuccess: () => {
+            dispatch(
+                setAuthState({
+                    isLoggedIn: false,
+                    isCookieChecked: true,
+                }),
+            );
+        },
+    });
+};
+
 interface RegisterResponse {
     message: string;
     user: User;
@@ -87,6 +146,38 @@ const register = async (data: RegisterArgs) => {
 
 export const useRegister = (history: History) => {
     return useMutation(register, {
+        onError: (err: any) => {
+            toast.error(err.message);
+        },
+        onSuccess: (data) => {
+            toast.success(data.message);
+
+            history.push('/login');
+        },
+    });
+};
+
+interface ResetArgs {
+    password: string;
+    otp: string;
+}
+
+interface ResetResponse {
+    message: string;
+}
+
+const reset = async (data: ResetArgs) => {
+    const response = await api({
+        method: 'post',
+        url: 'auth/reset',
+        data,
+    });
+
+    return response.data as ResetResponse;
+};
+
+export const useReset = (history: History) => {
+    return useMutation(reset, {
         onError: (err: any) => {
             toast.error(err.message);
         },

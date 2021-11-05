@@ -1,14 +1,9 @@
 import React from 'react';
-import { Switch } from 'react-router-dom';
 import { Box } from '@mui/material';
 
 import AppDrawer from '../app-drawer/app-drawer.component';
-import Logs from '../logs/logs.component';
-import PrivateRoute from '../private-route/private-route.component';
-import DashboardContent from '../dashboard-content/dashboard-content.component';
-import LogCreate from '../log-create/log-create.component';
-import LogDetail from '../log-detail/log-detail.component';
 import { DRAWER_WIDTH } from '../../constants';
+import DashboardRouter from '../dashboard-router/dashboard-router.component';
 
 interface DashboardProps {
     isDrawerOpen: boolean;
@@ -49,20 +44,7 @@ const Dashboard = ({ isDrawerOpen, toggleDrawer }: DashboardProps) => {
                     }),
                 }}
             >
-                <Switch>
-                    <PrivateRoute exact path="/dashboard">
-                        <DashboardContent />
-                    </PrivateRoute>
-                    <PrivateRoute exact path="/dashboard/logs/new">
-                        <LogCreate />
-                    </PrivateRoute>
-                    <PrivateRoute path="/dashboard/logs/:logId">
-                        <LogDetail />
-                    </PrivateRoute>
-                    <PrivateRoute path="/dashboard/logs">
-                        <Logs />
-                    </PrivateRoute>
-                </Switch>
+                <DashboardRouter />
             </Box>
         </>
     );

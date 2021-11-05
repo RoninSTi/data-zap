@@ -1,11 +1,12 @@
 import React from 'react';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Grid, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+
 import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 
-import { useAppDispatch } from '../../redux/hooks';
-import { forgot } from '../../redux/slices/auth';
+import { useForgot } from '../../queries/auth';
 
 const ForgotSchema = Yup.object().shape({
     email: Yup.string()
@@ -20,14 +21,10 @@ interface SubmitValues {
 }
 
 const Forgot = () => {
-    const dispatch = useAppDispatch();
+    const forgot = useForgot();
 
     const handleOnSubmit = (values: SubmitValues) => {
-        const { email } = values;
-
-        const data = { email };
-
-        dispatch(forgot(data));
+        forgot.mutate(values);
     };
 
     const { errors, handleChange, handleSubmit, touched, values } = useFormik({
@@ -65,9 +62,15 @@ const Forgot = () => {
                         error={touched.email && Boolean(errors.email)}
                         helperText={touched.email && errors.email}
                     />
-                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                    <LoadingButton
+                        type="submit"
+                        loading={forgot.isLoading}
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
                         Request Password
-                    </Button>
+                    </LoadingButton>
                     <Grid container>
                         <Grid item xs>
                             <Link to="/login">Sign in</Link>

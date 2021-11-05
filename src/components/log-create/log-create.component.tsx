@@ -5,8 +5,6 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { useHistory } from 'react-router-dom';
 
-import { useAppSelector } from '../../redux/hooks';
-import { selectIsLoading } from '../../redux/slices/ui';
 import FileUpload from '../file-upload/file-upload.component';
 import { useCreateLog } from '../../queries/log';
 
@@ -25,17 +23,12 @@ interface SubmitValues {
 }
 
 const Login = () => {
-    const { mutate } = useCreateLog();
-
     const history = useHistory();
 
-    const isLoading = useAppSelector(selectIsLoading);
-
-    const showLoading = isLoading.some((elem) => elem === 'logs/create');
+    const createLog = useCreateLog(history);
 
     const handleOnSubmit = async (values: SubmitValues) => {
-        mutate(values);
-        history.push('/dashboard/logs');
+        createLog.mutate(values);
     };
 
     const { errors, handleChange, handleSubmit, setFieldValue, touched, values } = useFormik({
@@ -119,7 +112,7 @@ const Login = () => {
                     </FormGroup>
                     <LoadingButton
                         type="submit"
-                        loading={showLoading}
+                        loading={createLog.isLoading}
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
