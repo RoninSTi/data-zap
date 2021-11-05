@@ -6,12 +6,14 @@ import { useFormik } from 'formik';
 import { useHistory } from 'react-router-dom';
 
 import FileUpload from '../file-upload/file-upload.component';
+import InputTags from '../input-tags/input-tags.component';
 import { useCreateLog } from '../../queries/log';
 
 const RegisterSchema = Yup.object().shape({
     csvUrl: Yup.string().url('Invalid url').required('Csv is required'),
     isPublic: Yup.boolean().required('Public is required'),
     notes: Yup.string(),
+    tags: Yup.array(Yup.string()),
     title: Yup.string().required('Title is required'),
 });
 
@@ -20,6 +22,7 @@ interface SubmitValues {
     isPublic: boolean;
     notes?: string;
     title: string;
+    tags: string[];
 }
 
 const Login = () => {
@@ -36,11 +39,22 @@ const Login = () => {
             csvUrl: '',
             notes: '',
             isPublic: true,
+            tags: [],
             title: '',
         },
         validationSchema: RegisterSchema,
         onSubmit: handleOnSubmit,
     });
+
+    const handleOnDeleteTag = (tag: string) => {
+        const updatedTags = values.tags.filter((elem) => elem !== tag);
+
+        setFieldValue('tags', updatedTags);
+    };
+
+    const handleOnSubmitTag = (tag: string) => {
+        setFieldValue('tags', [...values.tags, tag]);
+    };
 
     const handleOnUploadComplete = (url: string) => {
         setFieldValue('csvUrl', url);
@@ -96,6 +110,11 @@ const Login = () => {
                         onChange={handleChange}
                         error={touched.notes && Boolean(errors.notes)}
                         helperText={touched.notes && errors.notes}
+                    />
+                    <InputTags
+                        onDeleteTag={handleOnDeleteTag}
+                        onSubmitTag={handleOnSubmitTag}
+                        tags={values.tags}
                     />
                     <FormGroup>
                         <FormControlLabel

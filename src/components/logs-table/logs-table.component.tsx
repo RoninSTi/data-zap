@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -109,6 +110,22 @@ const LogsTable = ({
                         <TableRow hover key={row.id} onClick={(event) => onClickRow(event, row.id)}>
                             <TableCell component="th" scope="row">
                                 {row.title}
+                            </TableCell>
+                            <TableCell>
+                                <>
+                                    {row.tags.map((tag, index) => (
+                                        <Chip
+                                            key={`${row.id}-tag-${index}`}
+                                            label={tag.name}
+                                            sx={{
+                                                marginRight: (theme) => theme.spacing(1),
+                                                ':last-child': {
+                                                    marginRight: 0,
+                                                },
+                                            }}
+                                        />
+                                    ))}
+                                </>
                             </TableCell>
                             <TableCell style={{ width: 160 }} align="right">
                                 {row.isPublic}

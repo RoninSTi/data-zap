@@ -3,11 +3,18 @@ import { History } from 'history';
 
 import api from '../services/api';
 
+export interface Tag {
+    id: string;
+    name: string;
+}
+
 export interface Log {
     id: string;
     isPublic: boolean;
+    tags: Tag[];
     title: string;
     updatedAt: string;
+    viewedAt: string;
 }
 
 interface CreateLogData {
@@ -22,7 +29,7 @@ interface CreateLogResponse {
     log: Log;
 }
 
-export const createLog = async (data: CreateLogData) => {
+const createLog = async (data: CreateLogData) => {
     const response = await api({
         method: 'post',
         url: 'log',
@@ -31,6 +38,46 @@ export const createLog = async (data: CreateLogData) => {
     });
 
     return response.data as CreateLogResponse;
+};
+
+export const useCreateLog = (history: History) => {
+    const queryClient = useQueryClient();
+
+    return useMutation(createLog, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('logs');
+            history.push(`/dashboard/logs/${data.log.id}`);
+        },
+    });
+};
+
+interface ViewLogData {
+    logId: string;
+}
+
+interface ViewLogResponse {
+    message: string;
+    log: Log;
+}
+
+const viewLog = async (data: ViewLogData) => {
+    const response = await api({
+        method: 'put',
+        url: `log/${data.logId}/view`,
+        withCredentials: true,
+    });
+
+    return response.data as ViewLogResponse;
+};
+
+export const useViewLog = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation(viewLog, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('recent-logs');
+        },
+    });
 };
 
 interface FetchLogArgs {
@@ -69,13 +116,12 @@ export const fetchLogs = async (params: FetchLogsArgs) => {
     return response.data as FetchLogsResponse;
 };
 
-export const useCreateLog = (history: History) => {
-    const queryClient = useQueryClient();
-
-    return useMutation(createLog, {
-        onSuccess: (data) => {
-            queryClient.invalidateQueries('logs');
-            history.push(`/dashboard/logs/${data.log.id}`);
-        },
+export const recentlyViewedLogs = async () => {
+    const response = await api({
+        method: 'get',
+        url: 'log/recently-viewed',
+        withCredentials: true,
     });
+
+    return response.data as FetchLogsResponse;
 };
