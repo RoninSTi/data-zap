@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Typography } from '@mui/material';
-import { Link, useHistory } from 'react-router-dom';
+import { Box, Button, Container, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { useHistory } from 'react-router-dom';
 import { useQuery } from 'react-query';
 
 import { fetchLogs } from '../../queries/log';
@@ -33,6 +34,10 @@ const Logs = () => {
         history.push(`/dashboard/logs/${logId}`);
     };
 
+    const handleOnClickNew = () => {
+        history.push('/dashboard/logs/create');
+    };
+
     const handleOnPageChange = (
         event: React.MouseEvent<HTMLButtonElement> | null,
         newPage: number,
@@ -41,10 +46,19 @@ const Logs = () => {
     };
 
     return (
-        <Box>
+        <Container>
             <Loader isLoading={isLoading}>
-                <Box>
-                    <Link to="/dashboard/logs/create">New Log</Link>
+                <Box
+                    paddingY={2}
+                    sx={{
+                        display: 'flex',
+                        width: '100%',
+                        justifyContent: 'flex-end',
+                    }}
+                >
+                    <Button onClick={handleOnClickNew} startIcon={<AddIcon />} variant="contained">
+                        New Log
+                    </Button>
                 </Box>
                 {data?.logs.length ? (
                     <LogsTable
@@ -60,7 +74,7 @@ const Logs = () => {
                     <Typography>No logs</Typography>
                 )}
             </Loader>
-        </Box>
+        </Container>
     );
 };
 
